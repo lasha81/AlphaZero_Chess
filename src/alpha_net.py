@@ -70,7 +70,7 @@ class OutBlock(nn.Module):
         v = F.relu(self.bn(self.conv(s))) # value head
         v = v.view(-1, 8*8)  # batch_size X channel X height X width
         v = F.relu(self.fc1(v))
-        v = F.tanh(self.fc2(v))
+        v = torch.tanh(self.fc2(v))
         
         p = F.relu(self.bn1(self.conv1(s))) # policy head
         p = p.view(-1, 8*8*128)
@@ -100,8 +100,7 @@ class AlphaLoss(torch.nn.Module):
 
     def forward(self, y_value, value, y_policy, policy):
         value_error = (value - y_value) ** 2
-        policy_error = torch.sum((-policy* 
-                                (1e-6 + y_policy.float()).float().log()), 1)
+        policy_error = torch.sum((-policy*  (1e-6 + y_policy.float()).float().log()), 1)
         total_error = (value_error.view(-1).float() + policy_error).mean()
         return total_error
     
@@ -117,7 +116,7 @@ def train(net, dataset, epoch_start=0, epoch_stop=20, cpu=0):
     train_loader = DataLoader(train_set, batch_size=30, shuffle=True, num_workers=0, pin_memory=False)
     losses_per_epoch = []
     for epoch in range(epoch_start, epoch_stop):
-        scheduler.step()
+        #scheduler.step()
         total_loss = 0.0
         losses_per_batch = []
         for i,data in enumerate(train_loader,0):
@@ -137,6 +136,7 @@ def train(net, dataset, epoch_start=0, epoch_stop=20, cpu=0):
                 print("Value:",value[0].item(),value_pred[0,0].item())
                 losses_per_batch.append(total_loss/10)
                 total_loss = 0.0
+        scheduler.step()
         losses_per_epoch.append(sum(losses_per_batch)/len(losses_per_batch))
         if len(losses_per_epoch) > 100:
             if abs(sum(losses_per_epoch[-4:-1])/3-sum(losses_per_epoch[-16:-13])/3) <= 0.01:
@@ -149,5 +149,5 @@ def train(net, dataset, epoch_start=0, epoch_stop=20, cpu=0):
     ax.set_ylabel("Loss per batch")
     ax.set_title("Loss vs Epoch")
     print('Finished Training')
-    plt.savefig(os.path.join("./model_data/", "Loss_vs_Epoch_%s.png" % datetime.datetime.today().strftime("%Y-%m-%d")))
+    plt.savefig(os.path.join("./model_data/", "Loss_vs_Epoch_%s.png" % datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")))
 

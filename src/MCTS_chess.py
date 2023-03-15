@@ -138,7 +138,10 @@ def UCT_search(game_state, num_reads,net):
     for i in range(num_reads):
         leaf = root.select_leaf()
         encoded_s = ed.encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
-        encoded_s = torch.from_numpy(encoded_s).float().cuda()
+
+        if torch.cuda.is_available():
+            encoded_s = torch.from_numpy(encoded_s).float().cuda()
+
         child_priors, value_estimate = net(encoded_s)
         child_priors = child_priors.detach().cpu().numpy().reshape(-1); value_estimate = value_estimate.item()
         if leaf.game.check_status() == True and leaf.game.in_check_possible_moves() == []: # if checkmate
@@ -174,7 +177,7 @@ def get_policy(root):
     return policy
 
 def save_as_pickle(filename, data):
-    completeName = os.path.join("./datasets/iter2/",\
+    completeName = os.path.join("./datasets/iter3/",\
                                 filename)
     with open(completeName, 'wb') as output:
         pickle.dump(data, output)
@@ -223,13 +226,16 @@ def MCTS_self_play(chessnet,num_games,cpu):
             else:
                 dataset_p.append([s,p,value])
         del dataset
-        save_as_pickle("dataset_cpu%i_%i_%s" % (cpu,idxx, datetime.datetime.today().strftime("%Y-%m-%d")),dataset_p)
+        save_as_pickle("dataset_cpu%i_%i_%s" % (cpu,idxx, datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")),dataset_p)
 
 
     
 if __name__=="__main__":
-    
-    net_to_play="current_net_trained8_iter1.pth.tar"
+
+    #os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+
+    net_to_play="iter4_100.tar"
     mp.set_start_method("spawn",force=True)
     net = ChessNet()
     cuda = torch.cuda.is_available()
@@ -238,17 +244,22 @@ if __name__=="__main__":
     net.share_memory()
     net.eval()
     print("hi")
-    #torch.save({'state_dict': net.state_dict()}, os.path.join("./model_data/",\
-    #                                "current_net.pth.tar"))
-    
-    current_net_filename = os.path.join("./model_data/",\
-                                    net_to_play)
-    checkpoint = torch.load(current_net_filename)
+    #torch.save({'state_dict': net.state_dict()}, os.path.join("./model_data/", "current_net.pth.tar"))
+
+    current_net_filename = os.path.join("./model_data/", net_to_play)
+    #torch.save({'state_dict': net.state_dict()}, current_net_filename)
+
+    if torch.cuda.is_available():
+        checkpoint = torch.load(current_net_filename)
+    else:
+        checkpoint = torch.load(current_net_filename, map_location=torch.device('cpu'))
+
     net.load_state_dict(checkpoint['state_dict'])
     processes = []
-    for i in range(6):
-        p = mp.Process(target=MCTS_self_play,args=(net,50,i))
+    for i in range(1):
+        p = mp.Process(target=MCTS_self_play,args=(net,10,i))
         p.start()
         processes.append(p)
     for p in processes:
         p.join()
+
