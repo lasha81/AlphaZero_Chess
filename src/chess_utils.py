@@ -1,12 +1,12 @@
-import chess.pgn
+import copy
 import io
 import string
-from chess_board import board as c_board
-import encoder_decoder as ed
-import copy
-import geochri.src.chess_board as gb
-import numpy as np
+
 import chess
+import chess.pgn
+import numpy as np
+
+import geochri.src.chess_board as gb
 
 
 def make_string_geochri(current_board):

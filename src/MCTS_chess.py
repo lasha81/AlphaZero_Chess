@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-import pickle
-import os
 import collections
-import numpy as np
-import math
-import encoder_decoder as ed
-from chess_board import board as c_board
 import copy
+import datetime
+import math
+import os
+import pickle
+
+import numpy as np
 import torch
 import torch.multiprocessing as mp
-from alpha_net import ChessNet
-import datetime
+
+from .alpha_net import ChessNet
+from .chess_board import board as c_board
+from .encoder_decoder import decode_action, encode_action, encode_board
+
 
 class UCTNode():
     def __init__(self, game, move, parent=None):
@@ -74,7 +77,7 @@ class UCTNode():
         for action in self.game.actions(): # possible actions
             if action != []:
                 initial_pos,final_pos,underpromote = action
-                action_idxs.append(ed.encode_action(self.game,initial_pos,final_pos,underpromote))
+                action_idxs.append(encode_action(self.game,initial_pos,final_pos,underpromote))
         if action_idxs == []:
             self.is_expanded = False
         self.action_idxes = action_idxs
@@ -86,7 +89,7 @@ class UCTNode():
         self.child_priors = c_p
     
     def decode_n_move_pieces(self,board,move):
-        i_pos, f_pos, prom = ed.decode_action(board,move)
+        i_pos, f_pos, prom = decode_action(board,move)
         for i, f, p in zip(i_pos,f_pos,prom):
             board.player = self.game.player
             board.move_piece(i,f,p) # move piece to get next board state s
@@ -137,7 +140,7 @@ def UCT_search(game_state, num_reads,net):
     root = UCTNode(game_state, move=None, parent=DummyNode())
     for i in range(num_reads):
         leaf = root.select_leaf()
-        encoded_s = ed.encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
+        encoded_s = encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
 
         if torch.cuda.is_available():
             encoded_s = torch.from_numpy(encoded_s).float().cuda()
@@ -151,7 +154,7 @@ def UCT_search(game_state, num_reads,net):
     return np.argmax(root.child_number_visits), root
 
 def do_decode_n_move_pieces(board,move):
-    i_pos, f_pos, prom = ed.decode_action(board,move)
+    i_pos, f_pos, prom = decode_action(board,move)
     for i, f, p in zip(i_pos,f_pos,prom):
         board.move_piece(i,f,p) # move piece to get next board state s
         a,b = i; c,d = f
@@ -205,7 +208,7 @@ def MCTS_self_play(chessnet,num_games,cpu):
             if draw_counter == 3: # draw by repetition
                 break
             states.append(copy.deepcopy(current_board.current_board))
-            board_state = copy.deepcopy(ed.encode_board(current_board))
+            board_state = copy.deepcopy(encode_board(current_board))
             best_move, root = UCT_search(current_board,777,chessnet)
             current_board = do_decode_n_move_pieces(current_board,best_move) # decode move and move piece(s)
             policy = get_policy(root)
