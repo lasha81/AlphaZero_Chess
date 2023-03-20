@@ -177,7 +177,7 @@ def get_policy(root):
     return policy
 
 def save_as_pickle(filename, data):
-    completeName = os.path.join("./datasets/iter3/",\
+    completeName = os.path.join("./datasets/iter7/",\
                                 filename)
     with open(completeName, 'wb') as output:
         pickle.dump(data, output)
@@ -235,7 +235,7 @@ if __name__=="__main__":
     #os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 
-    net_to_play="iter4_100.tar"
+    net_to_play="iter_5.tar"
     mp.set_start_method("spawn",force=True)
     net = ChessNet()
     cuda = torch.cuda.is_available()
@@ -244,6 +244,7 @@ if __name__=="__main__":
     net.share_memory()
     net.eval()
     print("hi")
+    print(net)
     #torch.save({'state_dict': net.state_dict()}, os.path.join("./model_data/", "current_net.pth.tar"))
 
     current_net_filename = os.path.join("./model_data/", net_to_play)
@@ -257,7 +258,7 @@ if __name__=="__main__":
     net.load_state_dict(checkpoint['state_dict'])
     processes = []
     for i in range(1):
-        p = mp.Process(target=MCTS_self_play,args=(net,10,i))
+        p = mp.Process(target=MCTS_self_play,args=(net,300,i))
         p.start()
         processes.append(p)
     for p in processes:

@@ -9,6 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
 import datetime
+import torch.utils.tensorboard
 
 class board_data(Dataset):
     def __init__(self, dataset): # dataset = np.array of (s, p, v)
@@ -105,6 +106,7 @@ class AlphaLoss(torch.nn.Module):
         return total_error
     
 def train(net, dataset, epoch_start=0, epoch_stop=20, cpu=0):
+    writer = torch.utils.tensorboard.SummaryWriter('./runs/'+datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
     torch.manual_seed(cpu)
     cuda = torch.cuda.is_available()
     net.train()
@@ -138,16 +140,26 @@ def train(net, dataset, epoch_start=0, epoch_stop=20, cpu=0):
                 total_loss = 0.0
         scheduler.step()
         losses_per_epoch.append(sum(losses_per_batch)/len(losses_per_batch))
-        if len(losses_per_epoch) > 100:
+        if len(losses_per_epoch) > 200:
             if abs(sum(losses_per_epoch[-4:-1])/3-sum(losses_per_epoch[-16:-13])/3) <= 0.01:
                 break
 
+        writer.add_scalars(
+            "loss_6",
+            {
+                "total_loss": sum(losses_per_batch)/len(losses_per_batch)
+            },
+            epoch,
+        )
+
     fig = plt.figure()
-    ax = fig.add_subplot(222)
+    ax = fig.add_subplot(111)
     ax.scatter([e for e in range(1,epoch_stop+1,1)], losses_per_epoch)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss per batch")
     ax.set_title("Loss vs Epoch")
+    plt.ylim(0, 5)
     print('Finished Training')
     plt.savefig(os.path.join("./model_data/", "Loss_vs_Epoch_%s.png" % datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")))
 
+    writer.close()
