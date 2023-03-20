@@ -68,11 +68,11 @@ class board():
                 next_positions.append((i-1,j+1))
         if i in [1,2,3,4,5] and board_state[i-1,j]==" ":
             next_positions.append((i-1,j))          
-        if j==0 and board_state[i-1,j+1] in ["r", "n", "b", "q", "k", "p"]:
+        if j==0 and i in [1,2,3,4,5,6] and board_state[i-1,j+1] in ["r", "n", "b", "q", "k", "p"]:
             next_positions.append((i-1,j+1))
-        elif j==7 and board_state[i-1,j-1] in ["r", "n", "b", "q", "k", "p"]:
+        elif j==7 and i in [1,2,3,4,5,6] and board_state[i-1,j-1] in ["r", "n", "b", "q", "k", "p"]:
             next_positions.append((i-1,j-1))
-        elif j in [1,2,3,4,5,6]:
+        elif j in [1,2,3,4,5,6] and i in [1,2,3,4,5,6]:
             if board_state[i-1,j+1] in ["r", "n", "b", "q", "k", "p"]:
                 next_positions.append((i-1,j+1))
             if board_state[i-1,j-1] in ["r", "n", "b", "q", "k", "p"]:
@@ -96,7 +96,7 @@ class board():
                 if board_state[i+2,j]==" ":
                     next_positions.append((i+2,j))
         # en passant capture
-        elif i==4 and self.en_passant!=-999:
+        elif i==4 and j in [1,2,3,4,5,6] and self.en_passant!=-999:
             if j-1==self.en_passant and abs(self.en_passant_move-self.move_count) == 1:
                 next_positions.append((i+1,j-1))
             elif j+1==self.en_passant and abs(self.en_passant_move-self.move_count) == 1:
