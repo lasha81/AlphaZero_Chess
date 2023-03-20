@@ -142,8 +142,9 @@ def UCT_search(game_state, num_reads,net):
         leaf = root.select_leaf()
         encoded_s = encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
 
+        encoded_s = torch.as_tensor(encoded_s, dtype=torch.float32)
         if torch.cuda.is_available():
-            encoded_s = torch.from_numpy(encoded_s).float().cuda()
+            encoded_s = encoded_s.cuda()
 
         child_priors, value_estimate = net(encoded_s)
         child_priors = child_priors.detach().cpu().numpy().reshape(-1); value_estimate = value_estimate.item()
