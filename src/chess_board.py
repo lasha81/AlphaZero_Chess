@@ -103,9 +103,9 @@ class board():
                 next_positions.append((i+1,j+1))
         if i in [2,3,4,5,6] and board_state[i+1,j]==" ":
             next_positions.append((i+1,j))          
-        if j==0 and i in [1,2,3,4,5,6] and board_state[i+1,j+1] in ["R", "N", "B", "Q", "K", "P"]:
+        if j==0 and i in [2,3,4,5,6] and board_state[i+1,j+1] in ["R", "N", "B", "Q", "K", "P"]:
             next_positions.append((i+1,j+1))
-        elif j==7 and board_state[i+1,j-1] in ["R", "N", "B", "Q", "K", "P"]:
+        elif j==7 and i in [2,3,4,5,6] and board_state[i+1,j-1] in ["R", "N", "B", "Q", "K", "P"]:
             next_positions.append((i+1,j-1))
         elif j in [2,3,4,5,6] and i in [1,2,3,4,5,6]:
             if board_state[i+1,j+1] in ["R", "N", "B", "Q", "K", "P"]:
