@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import numpy as np
-from chess_board import board as chessboard
+
+from .chess_board import board as chessboard
+
 
 def encode_board(board):
     board_state = board.current_board; 

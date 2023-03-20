@@ -1,11 +1,16 @@
 #!/usr/bin/env python
+import datetime
+import os
+
+import matplotlib
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-import matplotlib
+from torch.utils.data import DataLoader, Dataset
+
 matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 import os
 import datetime

@@ -6,9 +6,12 @@ import pickle
 import numpy as np
 import torch
 
-def train_chessnet(net_to_train="iter_5.tar",save_as="iter_6.tar"):
+from .alpha_net import ChessNet, train
+
+
+def train_chessnet(net_to_train="current_net_trained8.pth.tar",save_as="iter_single.tar"):
     # gather data
-    data_path = "./datasets/iter6/"
+    data_path = "./datasets/iter2/"
     datasets = []
 
 
