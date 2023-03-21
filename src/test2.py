@@ -12,7 +12,8 @@ chess_api_board = chess.Board()
 # print(board.legal_moves)
 
 
-filename = '../data/chess-games/sample.txt'
+filename = '../data/sample.txt'
+#filename = '../data/all.txt'
 f = open(filename, "r")
 Lines = f.readlines()
 

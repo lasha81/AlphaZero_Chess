@@ -26,11 +26,11 @@ b = chess.Board()
 
 #p_stockfish_1350 = players.StockfishChessPlayer(engine_path='/usr/games/stockfish',engine_elo=1350)
 p_random = players.RandomChessPlayer()
-p_geo1 = players.GeochriPlayer(parameters_file='model_data/iter_1.tar',mcts_steps_per_move = 100)
-p_geo2 = players.GeochriPlayer(parameters_file='model_data/iter_2.tar',mcts_steps_per_move = 100)
-p_geo3 = players.GeochriPlayer(parameters_file='model_data/iter_3.tar',mcts_steps_per_move = 100)
-p_geo4 = players.GeochriPlayer(parameters_file='model_data/iter_4.tar',mcts_steps_per_move = 100)
-p_geo5 = players.GeochriPlayer(parameters_file='model_data/iter_5.tar',mcts_steps_per_move = 100)
+p_geo1 = players.GeochriPlayer(parameters_file='model_data/iter_1.tar',mcts_steps_per_move = 50)
+p_geo2 = players.GeochriPlayer(parameters_file='model_data/iter_2.tar',mcts_steps_per_move = 50)
+p_geo3 = players.GeochriPlayer(parameters_file='model_data/iter_3.tar',mcts_steps_per_move = 50)
+p_geo4 = players.GeochriPlayer(parameters_file='model_data/iter_4.tar',mcts_steps_per_move = 50)
+p_geo5 = players.GeochriPlayer(parameters_file='model_data/iter_5.tar',mcts_steps_per_move = 50)
 
 TOTAL_GAMES = 5
 
@@ -49,6 +49,7 @@ def play_players(player1, player2, board, num_games = TOTAL_GAMES):
                 break
             m = player2.choose_move(b.mirror())
             m = chess.Move(chess.square_mirror(m.from_square), chess.square_mirror(m.to_square), m.promotion)
+            #m = player2.choose_move(b)
             print(m.uci())
             b.push(m)
             print(b)
@@ -59,4 +60,4 @@ def play_players(player1, player2, board, num_games = TOTAL_GAMES):
 
     print(outcomes)
 
-play_players(p_random,p_geo5, b, 3)
+play_players(p_geo5,p_geo1, b, TOTAL_GAMES)

@@ -612,12 +612,22 @@ class board():
         if self.player == 0:
             c_list,_ = self.possible_B_moves(threats=True)
             king_position = np.where(self.current_board=="K")
+            opposite_king_position = np.where(self.current_board=="k")
+
+            if abs(king_position[0]-opposite_king_position[0]) <=1 \
+                    and abs(king_position[1] - opposite_king_position[1]) <=1:
+                return True
             i, j = king_position
             if (i,j) in c_list:
                 return True
         elif self.player == 1:
             c_list,_ = self.possible_W_moves(threats=True)
             king_position = np.where(self.current_board=="k")
+            opposite_king_position = np.where(self.current_board=="K")
+
+            if abs(king_position[0]-opposite_king_position[0]) <=1 \
+                    and abs(king_position[1] - opposite_king_position[1]) <=1:
+                return True
             i, j = king_position
             if (i,j) in c_list:
                 return True
